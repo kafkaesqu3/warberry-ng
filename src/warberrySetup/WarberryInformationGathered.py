@@ -82,9 +82,11 @@ class WarberryInformationGathered:
 
     def scanning(self,status, intensity, iface, quick, war_db):
         if quick == False:
+            print("Starting single-threaded port scanner")
             scanner = targettedScanner()
             scanner.single_port_scanner(self.CIDR, intensity, iface, self.liveIPs,war_db)
         else:
+            print("Starting multi-threaded port scanner")
             scanner = ThreadPortScanner()
             session=war_db.getSession()
             self.scanners = scanner.thread_port_scanner(self.CIDR, intensity, iface, self.liveIPs,session)
@@ -190,7 +192,7 @@ class WarberryInformationGathered:
 
     def namechange(self, hostnameOption, host_name):
         if (hostnameOption == True) and (host_name == 'WarBerry'):
-            mvp_hosts = ['DEMO', 'DEV', 'PRINTER', 'BACKUP', 'DC', 'DC1', 'DC2']
+            mvp_hosts = ['DEMO', 'DEV', 'PRINT', 'BACKUP', 'DC', 'DC1', 'DC2', 'SQL']
             hostname = socket.gethostname()
             mvp_found = False
             mvps=[]

@@ -68,6 +68,6 @@ class Scanner:
                         port) + " ***" + bcolors.ENDC)
                     war_db.insertScanner(name,host)
                     print(bcolors.TITLE + message + bcolors.ENDC)
- #           print(bcolors.TITLE + "\n[+] Done! Results saved in warberry.db"  "\n" + bcolors.ENDC)
+            print(bcolors.TITLE + "\n[+] Done! Results saved in warberry.db"  "\n" + bcolors.ENDC)
         return hosts
 

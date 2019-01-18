@@ -56,6 +56,8 @@ class Warberry:
             self.warberryInformationGathering.namechange(self.warberryArgs.getHostname(), self.warberryArgs.getName())
 
             if self.warberryArgs.getRecon() == False:
+                print("Starting recon mode")
+
                 self.warberryInformationGathering.scanning(self.status, self.warberryArgs.getIntensity(),
                                                        self.warberryArgs.getInterface(), self.warberryArgs.getQuick(), warberryDB)
                 warberryDB.updateStatus("Completed Scanning Module")
@@ -66,6 +68,9 @@ class Warberry:
                 self.warberryInformationGathering.wifi(self.status, self.warberryArgs.getWifi(),warberryDB)
                 warberryDB.updateElements(self.warberryInformationGathering)
                 warberryDB.insertWifis()
+            else: 
+                print("Skipping recon mode")
+
         
 
         FinishTime=start+int(self.warberryArgs.getTime())
