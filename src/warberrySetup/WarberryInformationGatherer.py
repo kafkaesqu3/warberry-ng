@@ -1,103 +1,63 @@
 from src.core.enumeration.ip_enum import *
 from src.core.enumeration.network_packets import *
-from src.core.enumeration.hostnames import *
 from src.core.scanners.targetted_scanner import *
 from src.core.scanners.thread_targetted_scanner import *
 from src.core.enumeration.services_enum import *
-from src.core.enumeration.bluetooth_enum import *
-from src.core.enumeration.wifi_enum import *
 from src.utils.utils import *
 from src.utils.console_colors import *
+import nmap
 
-class WarberryInformationGathered:
+# I want to refactor this so you give it a target subnet and it goes and does the recon
+# Warberry.py should call this module against its local LAN, and then if enabled, we should call this against another network
+
+# this will require refactoring out everything related to localhost networking configuration
+class WarberryInformationGatherer:
 
     IPsFound=""
 
-    def __init__(self):
-        self.int_ip=""
-        self.netmask=""
+    def __init__(self, CIDR, timestamp):
         self.CIDR=""
-        self.external_ip=""
         self.liveIPs=[]
-        self.hostnamesF = {}
         self.scanners={}
         self.enumeration={}
-        self.bluetooths=[]
-        self.wifis=[]
+        self.timestamp = timestamp
+
+    def getTimestamp(self):
+        return self.timestamp
 
     def getLiveIPS(self):
         return self.liveIPs
-    
-    def setInternalIP(self, iface):
-        self.int_ip = iprecon(iface, self.netmask)
-
-    def getInternalIP(self):
-        return self.int_ip
-    
-    def setExternalIP(self):
-        self.external_ip=external_IP_recon()
-        if (self.external_ip==None):
-            print(bcolors.WARNING + "[!] Could not reach the outside world. Possibly behind a firewall or some kind filtering\n" + bcolors.ENDC)
-        else:
-            print('[+] External IP obtained: ' + bcolors.OKGREEN + '%s\n' %self.external_ip + bcolors.ENDC)
-
-    def getExternalIP(self):
-        return self.external_ip
-
-    def setNetmask(self,iface):
-        self.netmask = netmask_recon(iface)
-
-    def getNetmask(self):
-        return self.netmask
-
-    def setCIDR(self):
-        self.CIDR=subnet(self.int_ip,self.netmask)
-
-    def getCIDR(self):
-        return self.CIDR
-
-    def getWifis(self):
-        return self.wifis
-
-    def getBlues(self):
-        return self.bluetooths
-
-    def getHostnamesF(self):
-        return self.hostnamesF
 
     def getScanners(self):
         return self.scanners
 
-    def pcap(self,status, iface, packets, expire):
-        sniffer(status, iface, packets, expire)
+    def arpscan(self):
+        #Discover live hosts
+        nm=nmap.PortScanner()
+        nm_arp=nm.scan(hosts=self.CIDR,arguments="-sn")
+        for x in nm_arp.items()[1][1]:
+            self.live_ips.append(x)
+            
+        self.live_ips.remove(int_ip) # we dont need to scan ourself
 
-    def hostnames(self):
-        warHostnames = Hostname()
-        warHostnames.findHostnames(self.int_ip, self.CIDR)
-        self.hostnamesF["ips"]=warHostnames.getIPsGathered()
-        self.hostnamesF["os"]=warHostnames.getOSGathered()
-        self.hostnamesF["domains"]=warHostnames.getDomainsGathered()
-        self.hostnamesF["hostnamesGathered"]=warHostnames.getHostnamesGathered()
-        self.liveIPs=warHostnames.getLiveIPS()
+    # def hostnames(self):
+    #     warHostnames = Hostname()
+    #     warHostnames.findHostnames(self.int_ip, self.CIDR, self.timestamp)
+    #     self.hostnamesF["ips"]=warHostnames.getIPsGathered()
+    #     self.hostnamesF["os"]=warHostnames.getOSGathered()
+    #     self.hostnamesF["domains"]=warHostnames.getDomainsGathered()
+    #     self.hostnamesF["hostnamesGathered"]=warHostnames.getHostnamesGathered()
+    #     self.liveIPs=warHostnames.getLiveIPS()
 
-    def scanning(self,status, intensity, iface, quick, war_db):
-        if quick == False:
-            print("Starting single-threaded port scanner")
-            scanner = targettedScanner()
-            scanner.single_port_scanner(self.CIDR, intensity, iface, self.liveIPs,war_db)
-        else:
-            print("Starting multi-threaded port scanner")
-            scanner = ThreadPortScanner()
-            session=war_db.getSession()
-            self.scanners = scanner.thread_port_scanner(self.CIDR, intensity, iface, self.liveIPs,session)
+    def scanning(self,status, intensity, iface, quick):
+        print("Starting single-threaded port scanner")
+        scanner = targettedScanner()
+        scanner.single_port_scanner(self.CIDR, intensity, iface, self.liveIPs)
         self.scanners = scanner.scanners
-	print(bcolors.TITLE + "\n[+] Done! Results saved in warberry.db"  "\n" + bcolors.ENDC)
-        war_db.updateStatus("Completed Port Scanning")
         status.warberryOKGREEN("Completed Port Scanning")
         
 
-    def enumerate(self,status, enumeration,iface, war_db):
-        session=war_db.getSession()
+    def enumerate(self,status, enumeration,iface):
         if enumeration == False:
             print("Enumerating services")
             if "Windows Hosts" in self.scanners:
@@ -107,40 +67,34 @@ class WarberryInformationGathered:
                     self.enumeration["shares_enum"] = shares_enum(iface, self.scanners["Windows Hosts"])
                     status.warberryOKGREEN("Completed Enumerating Shares")
                     self.enumeration["smb_users_enum"]=smb_users(iface, self.scanners["Windows Hosts"])
-                    war_db.updateStatus("Completed Enumerating Users")
                     status.warberryOKGREEN("Completed Enumerating Users")
             if "NFS" in self.scanners:
                 if len(self.scanners["NFS"]) > 0:
                     nfs_set = set(self.scanners["NFS"])
                     self.scanners["NFS"] = list(nfs_set)
                     self.enumeration["nfs_enum"] = nfs_enum(iface, self.scanners["NFS"])
-                    war_db.updateStatus("Completed NFS Enumeration")
                     status.warberryOKGREEN("Completed NFS Enumeration")
             if "MySQL Databases" in self.scanners:
                 if len(self.scanners["MySQL Databases"]) > 0:
                     mysql_set = set(self.scanners["MySQL Databases"])
                     self.scanners["MySQL Databases"] = list(mysql_set)
                     self.enumeration["mysql_enum"] = mysql_enum(iface, self.scanners["MySQL Databases"])
-                    war_db.updateStatus("Completed MySQL Enumeration")
             if "MSSQL Databases" in self.scanners:
                 if len(self.scanners["MSSQL Databases"]) > 0:
                     mssql_set = set(self.scanners["MSSQL Databases"])
                     self.scanners["MSSQL Databases"] = list(mssql_set)
                     self.enumeration["mssql_enum"] = mssql_enum(iface, self.scanners["MSSQL Databases"])
-                    war_db.updateStatus("Completed MSSQL Enumeration")
             if "SNMP" in self.scanners:
                 if len(self.scanners["SNMP"]) > 0:
                     snmp_set = set(self.scanners["SNMP"])
                     self.scanners["SNMP_Unique"] = list(snmp_set)
                     self.enumeration["snmp_enum"] = snmp_enum(iface, self.scanners["SNMP_Unique"])
-                    war_db.updateStatus("Completed SNMP Enumeration")
                     status.warberryOKGREEN("Completed SNMP Enumeration")
             if "FTP" in self.scanners:
                 if len(self.scanners["FTP"]) > 0:
                     ftp_set = set(self.scanners["FTP"])
                     self.scanners["FTP"] = list(ftp_set)
                     self.enumeration["ftp_enum"] = ftp_enum(iface, self.scanners["FTP"])
-                    war_db.updateStatus("Completed FTP Enumeration")
                     status.warberryOKGREEN("Completed FTP Enumeration")
             if "VOIP" in self.scanners:
                 if len(self.scanners["VOIP"]) > 0:
@@ -149,7 +103,6 @@ class WarberryInformationGathered:
                     self.enumeration["sip_methods_enum"] = sip_methods_enum(iface, self.scanners["VOIP"])
                     status.warberryOKGREEN("Completed SIP Methods Enumeration")
                     self.enumeration["sip_users_enum"] = sip_users_enum(iface, self.scanners["VOIP"])
-                    war_db.updateStatus("Completed VOIP Enumeration")
                     status.warberryOKGREEN("Completed VOIP Enumeration")
             webs=[]
             if ("Web Servers Running on Port 80" in self.scanners) and (len(self.scanners["Web Servers Running on Port 80"])>0):
@@ -181,18 +134,6 @@ class WarberryInformationGathered:
         else: 
             print("Skipping service enumeration")
 
-
-    def bluetooth(self,status, blue,war_db):
-        if blue == True:
-            self.bluetooths = bluetooth_enum()
-            war_db.updateStatus("Completed Bluetooth Scan")
-            status.warberryOKGREEN("Completed Bluetooth Scan")
-
-    def wifi(self,status, wif, war_db):
-        if wif == True:
-            self.wifis = wifi_enum()
-            war_db.updateStatus("Completed WIFI networks scan")
-            status.warberryOKGREEN("Completed WIFI networks scan")
 
     def namechange(self, hostnameOption, host_name):
         if (hostnameOption == True) and (host_name == 'WarBerry'):

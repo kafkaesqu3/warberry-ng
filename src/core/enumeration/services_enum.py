@@ -38,6 +38,10 @@ def shares_enum(iface, hosts):
         print(bcolors.TITLE + "[+] Done! Results saved in warberry.db" + bcolors.ENDC)
         return shares_res
 
+def smb_finger(iface, hosts): 
+    print("TODO")
+
+# TODO: refactor SMB users to us enum4linux against targets
 def smb_users(iface, hosts):
         print(" ")
         print(bcolors.OKGREEN + "      [ SMB USERS ENUMERATION MODULE ]\n" + bcolors.ENDC)

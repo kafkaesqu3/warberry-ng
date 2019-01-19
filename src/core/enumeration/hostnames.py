@@ -15,7 +15,6 @@ GNU General Public License for more details.
 
 import os, os.path, sys, socket
 import subprocess
-import nmap
 from prettytable import PrettyTable
 from src.utils.console_colors import *
 from dns import resolver
@@ -48,7 +47,7 @@ class Hostname:
     def gethostnames(self):
         return self.hostnames
 
-    def findHostnames(self, int_ip, CIDR):
+    def findHostnames(self, int_ip, CIDR, timestamp):
 
         print(bcolors.OKGREEN + "      [ HOSTNAMES ENUMERATION MODULE ]\n" + bcolors.ENDC)
         hostname = socket.gethostname()
@@ -68,10 +67,10 @@ class Hostname:
             for x in nm_arp.items()[1][1]:
                 self.live_ips.append(x)
             
-            self.live_ips.remove(int_ip)
+            self.live_ips.remove(int_ip) # we dont need to scan ourself
 
             for live_ip in self.live_ips:
-                subprocess.call('cme -t 1 --timeout 2 smb %s  >> Results/hostnames' % live_ip, shell=True)
+                subprocess.call('cme -t 1 --timeout 2 smb %s  >> Results/hostnames_%s' % (live_ip, timestamp), shell=True)
             
             subprocess.call("strings Results/hostnames | grep '445' | awk '{print $2}' > Results/ips_gathered",shell=True)
             subprocess.call("strings Results/hostnames | grep '445' | awk '{print $4}' > Results/hostnames_gathered",shell=True)

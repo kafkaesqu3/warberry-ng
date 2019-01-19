@@ -16,14 +16,13 @@ import os, os.path
 import nmap
 from src.utils.console_colors import *
 from src.utils.port_obj_Read import port_obj_reader
-from src.warberrySetup.WarberryDB import *
 
 class targettedScanner:
 
     def __init__(self):
         self.scanners={}
 
-    def single_port_scanner(self,CIDR, intensity, iface, hostlist, war_db):
+    def single_port_scanner(self,CIDR, intensity, iface, hostlist):
         print(" ")
         print(bcolors.OKGREEN + " [ TARGETTED SERVICES NETWORK SCANNER MODULE ]\n" + bcolors.ENDC)
         print("\n[*] Beginning Scanning Subnet %s" % CIDR)
@@ -41,11 +40,11 @@ class targettedScanner:
                 count += 1
             scan=Scanner()
             self.scanners[str(temp[0])] = scan.scanner(str(temp[0]), str(temp[5]).split('.'), str(temp[4]), intensity,
-                                         str(temp[1]), hostlist, iface, war_db)
+                                         str(temp[1]), hostlist, iface)
 
 
 class Scanner:
-    def scanner(self,name, port, message, intensity, type, hostlist, iface, war_db):
+    def scanner(self,name, port, message, intensity, type, hostlist, iface):
         port = str(port).translate(None, '\'\"][ ')
         port = port.split(',')
         print("[+] Scanning for " + name + " ...")
@@ -66,7 +65,6 @@ class Scanner:
                     hosts.append(host)
                     print(bcolors.OKGREEN + "*** " + name + " Found : %s via port " % host + str(
                         port) + " ***" + bcolors.ENDC)
-                    war_db.insertScanner(name,host)
                     print(bcolors.TITLE + message + bcolors.ENDC)
             print(bcolors.TITLE + "\n[+] Done! Results saved in warberry.db"  "\n" + bcolors.ENDC)
         return hosts

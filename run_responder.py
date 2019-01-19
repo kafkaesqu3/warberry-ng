@@ -22,8 +22,8 @@ def main(timestamp):
     # delete responder_outputERR file!!!
     #if os.path.exists("Results/responder_outputERR"):
     #    os.remove("Results/responder_outputERR")
-    stdout = open("Results/responder_output" + timestamp, "a+")
-    stderr = open("Results/responder_outputERR" + timestamp, "a+")
+    stdout = open("Results/responder_output_%s" % timestamp, "a+")
+    stderr = open("Results/responder_outputERR_%s" % timestamp, "a+")
     subprocess.call("sudo timeout "+ sys.argv[1]+ " python Tools/Responder/Responder.py -I "+sys.argv[2],shell=True,stdout=stdout,stderr=stderr)
 
 if __name__ == "__main__":
