@@ -12,6 +12,7 @@ import signal
 class Warberry:
 
     def __init__(self,parser):
+        self.timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d%H%M%S')
         self.status = WarberryStatus()
         start=int(time.time())
         #If not sudo

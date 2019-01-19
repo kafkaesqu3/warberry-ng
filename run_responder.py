@@ -15,15 +15,15 @@ GNU General Public License for more details.
 import subprocess
 import os, sys
 
-def main():
+def main(timestamp):
     # delete responder_output file!!!
-    if os.path.exists("Results/responder_output"):
-        os.remove("Results/responder_output")
+    #if os.path.exists("Results/responder_output"):
+    #    os.remove("Results/responder_output")
     # delete responder_outputERR file!!!
-    if os.path.exists("Results/responder_outputERR"):
-        os.remove("Results/responder_outputERR")
-    stdout = open("Results/responder_output", "wb")
-    stderr = open("Results/responder_outputERR", "wb")
+    #if os.path.exists("Results/responder_outputERR"):
+    #    os.remove("Results/responder_outputERR")
+    stdout = open("Results/responder_output" + timestamp, "a+")
+    stderr = open("Results/responder_outputERR" + timestamp, "a+")
     subprocess.call("sudo timeout "+ sys.argv[1]+ " python Tools/Responder/Responder.py -I "+sys.argv[2],shell=True,stdout=stdout,stderr=stderr)
 
 if __name__ == "__main__":

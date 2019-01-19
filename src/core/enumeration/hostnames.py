@@ -62,7 +62,6 @@ class Hostname:
         print(" ")
         
         try:
-            subprocess.call('cme -t 1 --timeout 2 smb %s  > Results/hostnames' % CIDR, shell=True)
             #Discover live hosts
             nm=nmap.PortScanner()
             nm_arp=nm.scan(hosts=CIDR,arguments="-sn")
@@ -71,6 +70,9 @@ class Hostname:
             
             self.live_ips.remove(int_ip)
 
+            for live_ip in self.live_ips:
+                subprocess.call('cme -t 1 --timeout 2 smb %s  >> Results/hostnames' % live_ip, shell=True)
+            
             subprocess.call("strings Results/hostnames | grep '445' | awk '{print $2}' > Results/ips_gathered",shell=True)
             subprocess.call("strings Results/hostnames | grep '445' | awk '{print $4}' > Results/hostnames_gathered",shell=True)
             subprocess.call('strings Results/hostnames | grep ":" | cut -d ":" -f 3 | cut -d ")" -f 1 > Results/domains_gathered', shell=True)
@@ -91,11 +93,11 @@ class Hostname:
             with open("Results/operating_systems", "r") as oper:
                 os_gathered = oper.readlines()
 
-            subprocess.call("rm Results/ips_gathered", shell=True)
-            subprocess.call("rm Results/hostnames_gathered", shell=True)
-            subprocess.call("rm Results/domains_gathered", shell=True)
-            subprocess.call("rm Results/operating_systems", shell=True)
-  	    subprocess.call("rm Results/hostnames", shell=True)  
+            #subprocess.call("rm Results/ips_gathered", shell=True)
+            #subprocess.call("rm Results/hostnames_gathered", shell=True)
+            #subprocess.call("rm Results/domains_gathered", shell=True)
+            #subprocess.call("rm Results/operating_systems", shell=True)
+  	         #subprocess.call("rm Results/hostnames", shell=True)  
 
             # Get the array length for the loop
             length = len(ips_gathered)
