@@ -99,6 +99,7 @@ class WarberryInformationGathered:
     def enumerate(self,status, enumeration,iface, war_db):
         session=war_db.getSession()
         if enumeration == False:
+            print("Enumerating services")
             if "Windows Hosts" in self.scanners:
                 if len(self.scanners["Windows Hosts"]) > 0:
                     windows_set = set(self.scanners["Windows Hosts"])
@@ -177,6 +178,9 @@ class WarberryInformationGathered:
                 webs_set = set(self.scanners["Webservers"])
                 self.enumeration["Webservers_enum"] = list(webs_set)
 #            print(self.enumeration)
+        else: 
+            print("Skipping service enumeration")
+
 
     def bluetooth(self,status, blue,war_db):
         if blue == True:
