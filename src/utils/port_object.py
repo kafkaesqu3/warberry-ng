@@ -40,15 +40,15 @@ class port_ob:
         self.scan_type=st
 
     #GETTER FUNCTION
-    def getatt(self,num):
-        if num==0:
+    def getattr(self,attr):
+        if attr=="path_file":
             return self.path_file
-        elif num==1:
+        elif attr=="result_file":
             return self.result_file
-        elif num==2:
+        elif attr=="message":
             return self.message
-        elif num==3:
+        elif attr=="name":
             return self.name
-        elif num==4:
-            return self.port
+        elif attr=="port":
+             return self.port
         else: return self.scan_type

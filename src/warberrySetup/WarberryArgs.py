@@ -73,12 +73,6 @@ class WarberryArgs:
     def setTime(self, t):
         self.time = t
 
-    def getQuick(self):
-        return self.quick
-
-    def setQuick(self, q):
-        self.quick=q
-
     def getHostname(self):
         return self.hostname
 
@@ -148,13 +142,10 @@ class WarberryArgs:
         self.setName(parser.name)
         self.setIntensity(parser.intensity)
         self.setPoison(parser.poison)
-        self.setQuick(parser.fast)
         self.setHostname(parser.hostname)
         self.setEnumeration(parser.enum)
         self.setTime(parser.time)
         self.setMalicious(parser.malicious)
-        self.setBluetooth(parser.btooth)
-        self.setWifi(parser.wifi)
         self.setRecon(parser.reconmode)
         self.setClear(parser.clear)
         self.setMan(parser.manpage)

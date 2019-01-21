@@ -24,6 +24,7 @@ def port_obj_reader(filename):
             f=line.split(',')
             s=f[5]     #this is to get only y/n not \n
             f[5]=s[0]   #this is to get only y/n not \n
+            					
             portOB = port_object.port_ob(f[0],f[1],f[2],f[3],f[4],f[5])
             ports_obj_list.append(portOB)
     return ports_obj_list

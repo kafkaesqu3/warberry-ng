@@ -16,15 +16,23 @@ import os, os.path
 import nmap
 from src.utils.console_colors import *
 from src.utils.port_obj_Read import port_obj_reader
+from pdb import set_trace as bp
+import subprocess
 
 class targettedScanner:
 
     def __init__(self):
-        self.scanners={}
 
-    def single_port_scanner(self,CIDR, intensity, iface, hostlist):
+        # dict of scanners
+        # key = name of service
+        # value = Scanner object for that service
+        self.scanners={}
+        self.results_dir = ""
+
+    def single_port_scanner(self,CIDR, intensity, iface, hostlist, results_dir):
+        self.results_dir = results_dir
         print(" ")
-        print(bcolors.OKGREEN + " [ TARGETTED SERVICES NETWORK SCANNER MODULE ]\n" + bcolors.ENDC)
+        print(bcolors.OKGREEN + " [ PORT SCANNER MODULE ]\n" + bcolors.ENDC)
         print("\n[*] Beginning Scanning Subnet %s" % CIDR)
         print(" ")
 
@@ -32,40 +40,45 @@ class targettedScanner:
         # port_obj_reader reads portlist_config file and creates a list with port_objects for scalability.
         # port list input filename is as below.
         ports_list = port_obj_reader("portlist_config")
-        for i in ports_list:
-            temp = []
-            count = 0
-            for key, value in vars(i).iteritems():
-                temp.append(value)
-                count += 1
-            scan=Scanner()
-            self.scanners[str(temp[0])] = scan.scanner(str(temp[0]), str(temp[5]).split('.'), str(temp[4]), intensity,
-                                         str(temp[1]), hostlist, iface)
+        #ports_list = str(ports_list).translate(None, '\'\"][ ')
+        #ports_list = ports_list.split(',')
 
-
-class Scanner:
-    def scanner(self,name, port, message, intensity, type, hostlist, iface):
-        port = str(port).translate(None, '\'\"][ ')
-        port = port.split(',')
-        print("[+] Scanning for " + name + " ...")
-        nm = nmap.PortScanner()
+        ports = []
         hosts = []
-        for i in range(0, len(port)):
-            if (type == "y"):
-                arg = "-Pn -sU -p:" + str(port[i]).translate(None, '\'][ ') + " " + intensity + " --open"
-            elif (type == "n"):
-                arg = "-Pn -p" + str(port[i]).translate(None, '\'][ ') + " " + intensity + " --open"
-            elif (type == "yn"):
-                arg = "-Pn -p -st -sU" + str(port[i]).translate(None, '\'][ ') + " " + intensity + "--open"
-            arg += " -e " + iface
-            for h in hostlist:
-                nm.scan(hosts=h, arguments=arg)
-                for host in nm.all_hosts():
-                    print("----------------------------------------------------")
-                    hosts.append(host)
-                    print(bcolors.OKGREEN + "*** " + name + " Found : %s via port " % host + str(
-                        port) + " ***" + bcolors.ENDC)
-                    print(bcolors.TITLE + message + bcolors.ENDC)
-            print(bcolors.TITLE + "\n[+] Done! Results saved in warberry.db"  "\n" + bcolors.ENDC)
-        return hosts
 
+        #name = str(temp[0])
+        #port = str(temp[5]).split('.')
+        ##message = str(temp[4])
+        #scantype = str(temp[1])
+
+
+        nmap = "/usr/bin/nmap"
+        nmap_args = " -Pn --open " + intensity
+        nmap_args += " -e " + iface
+
+
+        #nmap_host_arg = ""
+        for h in hostlist:
+            nmap_args += " " + h 
+
+        for service in ports_list:
+            service_name = service.getattr("name")
+            print("Scanning for %s\n" % service_name)
+            nmap_port_arg = ""
+            nmap_out_arg = ""
+            nmap_type_arg = ""
+            scantype = service.getattr("type")
+            if (scantype == "y"):
+                nmap_type_arg = " -sU -p"
+            elif (scantype == "n"):
+                nmap_type_arg = " -sS -p"
+
+            port_nums = service.getattr("port")
+            for p in port_nums: 
+                nmap_port_arg += p + ","
+            outfile_name = "%snmap_%s" % (results_dir, service_name)
+            nmap_out_arg = " -oA %s" % outfile_name
+            
+            print 
+            
+            subprocess.call("%s %s %s %s %s >/dev/null 2>&1" % (nmap, nmap_out_arg, nmap_args, nmap_type_arg, nmap_port_arg), shell=True)

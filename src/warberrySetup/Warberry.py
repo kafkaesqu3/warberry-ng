@@ -1,7 +1,6 @@
 from src.warberrySetup.WarberryArgs import *
 from src.warberrySetup.WarberryInformationGatherer import *
 from src.warberrySetup.WarberryStatus import *
-from src.warberrySetup.WarberryDB import *
 from src.utils.utils import *
 from src.core.exploits.Responder import *
 from src.core.enumeration.network_packets import *
@@ -44,43 +43,48 @@ class Warberry:
         
     
         # Set variables for warberry execution against LAN
-        setNetmask(self.warberryArgs.getInterface())
-        setInternalIP(self.warberryArgs.getInterface())
-        setCIDR()
-        setExternalIP()
+        self.setNetmask(self.warberryArgs.getInterface())
+        self.setInternalIP(self.warberryArgs.getInterface())
+        self.setCIDR()
+        self.setExternalIP()
         #warberryDB.updateStatus("Completed localhost network information gathering")
         
-        self.warberryInformationGathering = WarberryInformationGatherer(self.CIDR, self.timestamp)
+        print("Local subnet: %s" % self.CIDR)
+        self.subnetInformationGatherer = WarberryInformationGatherer(self.CIDR, self.timestamp)
 
 
-        if self.warberryInformationGathering.getInternalIP() is None:
-            print("No IP address on %s detected, exiting", )
+        if self.internal_ip is None:
+            print("No IP address on %s detected, exiting" % self.warberryArgs.getInterface())
             exit
         else:
-            #warberryDB.updateElements(self.warberryInformationGathering)
+            #warberryDB.updateElements(self.subnetInformationGatherer)
             #warberryDB.insertcommonWarInfo()
-            pcap(self.status, self.warberryArgs.getInterface(),
+            self.pcap(self.status, self.warberryArgs.getInterface(),
                                                    self.warberryArgs.getPackets(), self.warberryArgs.getExpire())
             
-            print("ARP scanning subnet")
-            self.warberryInformationGathering.arpscan()
+            self.subnetInformationGatherer.arpscan()
 
-            #self.warberryInformationGathering.hostnames()
-            #warberryDB.updateElements(self.warberryInformationGathering)
+            #self.subnetInformationGatherer.hostnames()
+            #warberryDB.updateElements(self.subnetInformationGatherer)
             #warberryDB.insertLiveIPS()
             #warberryDB.updateStatus("Completed Scope Definition Module")
             #warberryDB.insertHostnamesF()
-            #self.warberryInformationGathering.namechange(self.warberryArgs.getHostname(), self.warberryArgs.getName())
+            #self.subnetInformationGatherer.namechange(self.warberryArgs.getHostname(), self.warberryArgs.getName())
 
             if self.warberryArgs.getRecon() == False:
                 # recon mode = port scanning
-                print("Starting recon mode")
+                print("Starting recon mode: port scanning subnet")
 
-                self.warberryInformationGathering.scanning(self.status, self.warberryArgs.getIntensity(),
-                                                       self.warberryArgs.getInterface(), self.warberryArgs.getQuick())
+                self.subnetInformationGatherer.scanning(self.status, self.warberryArgs.getIntensity(),
+                                                       self.warberryArgs.getInterface())
                 #warberryDB.updateStatus("Completed Scanning Module")
                 # TODO add flag for service enumeration
-                self.warberryInformationGathering.enumerate(self.status, self.warberryArgs.getEnumeration(), self.warberryArgs.getInterface())
+                if self.warberryArgs.getEnumeration() == False:
+                    print("Service enumeration on ports identified as open")
+
+                    self.subnetInformationGatherer.enumerate(self.status, self.warberryArgs.getEnumeration(), self.warberryArgs.getInterface())
+                else: 
+                    print("Skipping enumeration mode")    
             else: 
                 print("Skipping recon mode")
 
@@ -93,11 +97,11 @@ class Warberry:
             current=int(time.time())
     
         responderResults=Responder()
-        hashes=responderResults.retrieveHashes()
-        if (len(hashes)>0):
-            warberryDB.saveHashes(hashes)
+        #hashes=responderResults.retrieveHashes()
+        #if (len(hashes)>0):
+        #    warberryDB.saveHashes(hashes)
 
-        warberryDB.updateEndTime()
+        #warberryDB.updateEndTime()
         
         #p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
         #out, err = p.communicate()
@@ -124,7 +128,7 @@ class Warberry:
         self.netmask = netmask_recon(iface)
 
     def setCIDR(self):
-        self.CIDR=subnet(self.int_ip,self.netmask)
+        self.CIDR=subnet(self.internal_ip,self.netmask)
 
 
 
