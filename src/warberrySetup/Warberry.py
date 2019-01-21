@@ -37,9 +37,9 @@ class Warberry:
         self.warberryArgs = WarberryArgs(parser)
         
         #Execute Responder
-        if (self.warberryArgs.getMalicious == True):
-            print("Starting responder poisoning for local subnet")
-            pid = subprocess.Popen(["sudo","python","run_responder.py",timestamp,str(self.warberryArgs.getInterface())]) # call subprocess
+        #if (self.warberryArgs.getMalicious == True):
+        #    print("Starting responder poisoning for local subnet")
+        #    pid = subprocess.Popen(["sudo","python","run_responder.py",timestamp,str(self.warberryArgs.getInterface())]) # call subprocess
         
     
         # Set variables for warberry execution against LAN
@@ -91,12 +91,12 @@ class Warberry:
         
 
         FinishTime=start+int(self.warberryArgs.getTime())
-        print ("Waiting for Responder ...")
-        current=int (time.time())
-        while (current<FinishTime):
-            current=int(time.time())
+        #print ("Waiting for Responder ...")
+        #current=int (time.time())
+        #while (current<FinishTime):
+        #    current=int(time.time())
     
-        responderResults=Responder()
+        #responderResults=Responder()
         #hashes=responderResults.retrieveHashes()
         #if (len(hashes)>0):
         #    warberryDB.saveHashes(hashes)
@@ -117,9 +117,9 @@ class Warberry:
     def setExternalIP(self):
         self.external_ip=external_IP_recon()
         if (self.external_ip==None):
-            print(bcolors.WARNING + "[!] Could not reach the outside world. Possibly behind a firewall or some kind filtering\n" + bcolors.ENDC)
+            print("[!] Could not reach the outside world. Possibly behind a firewall or some kind filtering\n")
         else:
-            print('[+] External IP obtained: ' + bcolors.OKGREEN + '%s\n' %self.external_ip + bcolors.ENDC)
+            print('[+] External IP obtained: %s\n' %self.external_ip)
 
     def setInternalIP(self, iface):
         self.internal_ip = iprecon(iface, self.netmask)

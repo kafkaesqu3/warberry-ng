@@ -14,7 +14,6 @@ GNU General Public License for more details.
 
 import os, os.path
 import nmap
-from src.utils.console_colors import *
 from src.utils.port_obj_Read import port_obj_reader
 from pdb import set_trace as bp
 import subprocess
@@ -32,7 +31,7 @@ class targettedScanner:
     def single_port_scanner(self,CIDR, intensity, iface, hostlist, results_dir):
         self.results_dir = results_dir
         print(" ")
-        print(bcolors.OKGREEN + " [ PORT SCANNER MODULE ]\n" + bcolors.ENDC)
+        print(" [ PORT SCANNER MODULE ]\n")
         print("\n[*] Beginning Scanning Subnet %s" % CIDR)
         print(" ")
 

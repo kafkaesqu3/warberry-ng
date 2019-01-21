@@ -14,7 +14,6 @@ GNU General Public License for more details.
 
 import os, os.path,sys
 import subprocess
-from src.utils.console_colors import *
 from scapy.all import *
 
 def sniffer(status, iface, packets, expire):
@@ -24,7 +23,7 @@ def sniffer(status, iface, packets, expire):
 	pcap_location2= "Results/capture2.pcap"
 	pcap_location3= "Results/capture3.pcap"
 
-        print (bcolors.OKGREEN + "      [ NETWORK PACKET SNIFFING MODULE ]\n" + bcolors.ENDC)
+        print ("      [ NETWORK PACKET SNIFFING MODULE ]\n" )
         print ("Sniffer will begin capturing %d packets for %d seconds" %(packets,expire))
         try:
                 pack = sniff(iface=iface, timeout=expire)
@@ -32,7 +31,7 @@ def sniffer(status, iface, packets, expire):
 		pack2=[]
 		if (len(pack)<packets):
 			packetsTo=packets-len(pack)
-			print (bcolors.OKGREEN + "[*] "+ bcolors.ENDC +"Sniffer will continue capturing another %s packets" %packetsTo)
+			print ("[*] Sniffer will continue capturing another %s packets" %packetsTo)
 			pack2=sniff (iface=iface, count=int(packetsTo))
 			wrpcap(pcap_location2, pack2)
 		else:
@@ -58,7 +57,7 @@ def sniffer(status, iface, packets, expire):
                 sys.exit(1)
         except:
                 print (" ")
-        print(bcolors.OKGREEN + "[+] " + bcolors.ENDC + "Capture Completed." + bcolors.ENDC + " PCAP File Saved at " + bcolors.OKGREEN + "%s!\n" %pcap_location + bcolors.ENDC)
+        print("[+] Capture Completed PCAP File Saved at %s!\n" % pcap_location)
         if os.path.exists("Results/arp_flush_temp"):
                 subprocess.call("sudo rm Results/arp_flush_temp", shell=True)  # delete temporary file.
 

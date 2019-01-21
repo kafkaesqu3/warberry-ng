@@ -22,18 +22,17 @@ import re
 from netaddr import *
 import xml.etree.ElementTree as ET
 from src.utils.info_banners import *
-from src.utils.console_colors import *
 
 
 def dhcp_check(status):
-        status.warberryOKGREEN("      [ DHCP SERVICE CHECK MODULE ]\n")
+        print("      [ DHCP SERVICE CHECK MODULE ]\n")
         dhcp_out = subprocess.check_output(['ps', '-A'])
         if "dhcp" in dhcp_out:
             print ("DHCP Service Status...\n")
-            status.warberryFAIL("Running - Not Stealth")
+            print("Running - Not Stealth")
         else:
             print ("DHCP Service Status...\n")
-            status.warberryOKGREEN("Not Running - Stealth")
+            print("Not Running - Stealth")
 
 def netmask_recon(iface):
 
@@ -45,8 +44,7 @@ def netmask_recon(iface):
         except:
             subprocess.call('clear', shell=True)
             banner_full()
-            print(
-                bcolors.FAIL + "Interface %s seems to be down. Try Running with -I to specify an interface" % iface + bcolors.ENDC)
+            print("Interface %s seems to be down. Try Running with -I to specify an interface" % iface)
             exit()
 
 def ip_validate(ip):
@@ -132,7 +130,7 @@ def XMLParser(file):
 
 def manual_namechange(host_name):
     print
-    ("[*] Changing Hostname from " + bcolors.WARNING + socket.gethostname() + bcolors.ENDC + " to " + bcolors.OKGREEN + "%s" % host_name + bcolors.ENDC)
+    ("[*] Changing Hostname from " + socket.gethostname() + " to " + "%s" % host_name )
     with open('/etc/hostname', 'w') as hostname:
         hostname.write(host_name)
     with open('/etc/hosts', 'w') as hosts:
@@ -141,4 +139,4 @@ def manual_namechange(host_name):
     subprocess.call('sudo systemctl daemon-reload 2>/dev/null', shell=True)
     subprocess.call('sudo /etc/init.d/hostname.sh 2>/dev/null', shell=True)
     print
-    ("[+] New hostname: " + bcolors.TITLE + socket.gethostname() + bcolors.ENDC)
+    ("[+] New hostname: " + socket.gethostname())

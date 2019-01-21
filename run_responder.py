@@ -28,4 +28,4 @@ def main(timestamp):
 
 if __name__ == "__main__":
     # execute main function
-    main()
+    main(sys.argv)

@@ -13,13 +13,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 """
 
-from src.utils.console_colors import *
 
 def banner():
 
         version = "6.0"
         codename = "Revival"
-        print (bcolors.TITLE + ( '''
+        print (( '''
 *******************************************************
   _    _  ___  ____________ ___________________   __
  | |  | |/ _ \ | ___ \ ___ \  ___| ___ \ ___ \ \ / /
@@ -36,13 +35,13 @@ def banner():
   Version: %s              Codename: %s
 
 ********************************************************
-''') %(version,codename) + bcolors.ENDC)
+''') %(version,codename) )
 
 
 
 def banner_full():
 
-        print (bcolors.TITLE + ( '''
+        print ( ( '''
  _    _  ___  ____________ ___________________   __
 | |  | |/ _ \ | ___ \ ___ \  ___| ___ \ ___ \ \ / /
 | |  | / /_\ \| |_/ / |_/ / |__ | |_/ / |_/ /\ V /
@@ -80,12 +79,12 @@ example usage: sudo python warberry.py -r                   Use only the recon m
                sudo python warberry.py -I eth0 -N HackerPC  Use the eth0 interface and change hostname to HackerPC
 
 
-''') + bcolors.ENDC)
+'''))
 
 
 def banner_full_help():
 
-        print (bcolors.TITLE + ( '''
+        print ( ( '''
  _    _  ___  ____________ ___________________   __
 | |  | |/ _ \ | ___ \ ___ \  ___| ___ \ ___ \ \ / /
 | |  | / /_\ \| |_/ / |_/ / |__ | |_/ / |_/ /\ V /
@@ -196,4 +195,4 @@ MAC Address Filtering Bypass
 
 NAC Filtering Bypass
 
-''') + bcolors.ENDC)
+'''))

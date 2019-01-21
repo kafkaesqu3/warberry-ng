@@ -3,7 +3,6 @@ from src.core.enumeration.network_packets import *
 from src.core.scanners.targetted_scanner import *
 from src.core.enumeration.services_enum import *
 from src.utils.utils import *
-from src.utils.console_colors import *
 import nmap
 import os
 
@@ -36,7 +35,7 @@ class WarberryInformationGatherer:
         return self.scanners
 
     def arpscan(self):
-        print("%s [ ARP scanning %s ]%s\n" % (bcolors.OKGREEN, self.CIDR, bcolors.ENDC))
+        print("[ ARP scanning %s ]\n" % (self.CIDR))
 
         #Discover live hosts
         nm=nmap.PortScanner()
@@ -162,31 +161,31 @@ class WarberryInformationGatherer:
             for host in hosts:
                 for mvp in mvp_hosts:
                     if host.strip() == mvp.strip():
-                        print (bcolors.OKGREEN + "\n[+] Found interesting hostname %s\n" % mvp.strip() + bcolors.ENDC)
+                        print ("\n[+] Found interesting hostname %s\n" % mvp.strip())
                         mvps.append(host.strip())
                         mvp_found = True
 
             if mvp_found != True:
-                print(bcolors.WARNING + "\n[-] No interesting names found. Continuing with the same hostname" + bcolors.ENDC)
+                print("\n[-] No interesting names found. Continuing with the same hostname")
 
             elif mvp_found == True:
 		mvp_changed = False
                 for mvp in mvps:
                     if mvp.strip() == hostname:
-                        print(bcolors.TITLE + "[*] Hostname is stealthy as is. Keeping the same!" + bcolors.ENDC)
+                        print("[*] Hostname is stealthy as is. Keeping the same!")
                     else:
 			if mvp_changed == False:
 				mvp_changed = True
                         	with open('/etc/hostname', 'w') as hostname:
                            		 hostname.write(mvp.strip())
                         	with open('/etc/hosts', 'w') as hosts:
-                                    	print ("[*] Changing Hostname from " + bcolors.WARNING + socket.gethostname() + bcolors.ENDC + " to " + bcolors.OKGREEN + mvp + bcolors.ENDC)
+                                    	print ("[*] Changing Hostname from " + socket.gethostname() + " to " + mvp)
                                     	hosts.write('127.0.0.1\tlocalhost\n::1\tlocalhost ip6-localhost ip6-loopback\nff02::1\tip6-allnodes\nff02::2\tip6-allrouters\n\n127.0.1.1\t%s' % mvp.strip())
 					#hosts.write('127.0.0.1\tlocalhost.localdomain\tlocalhost ip6-localhost\n127.0.1.1\t%s' % mvp.strip())
 					subprocess.call('hostname %s' %mvp.strip(),shell=True)
                                     	subprocess.call('sudo systemctl daemon-reload 2>/dev/null', shell=True)
                                     	subprocess.call('sudo /etc/init.d/hostname.sh 2>/dev/null', shell=True)
-                                    	print ("[+] New hostname: " + bcolors.TITLE + socket.gethostname() + bcolors.ENDC)
+                                    	print ("[+] New hostname: " + socket.gethostname())
 				hosts.close()
 				hostname.close()
 

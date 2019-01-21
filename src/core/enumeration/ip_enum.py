@@ -20,7 +20,7 @@ from scapy.all import *
 
 def iprecon(ifname, netmask):
 
-        print(bcolors.OKGREEN + "      [ IP ENUMERATION MODULE ]\n" + bcolors.ENDC)
+        print("      [ IP ENUMERATION MODULE ]\n")
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
@@ -28,16 +28,16 @@ def iprecon(ifname, netmask):
         except:
             subprocess.call('clear', shell=True)
             banner_full()
-            print(bcolors.FAIL + "Interface %s seems to be down. Try Running with -I to specify an interface" %ifname + bcolors.ENDC)
+            print("Interface %s seems to be down. Try Running with -I to specify an interface" %ifname)
             exit()
 
         if not ip_validate(int_ip) and int_ip != "169.254.253.251":
-            print('[+] Internal IP obtained on ' + bcolors.TITLE + '%s:' % ifname + bcolors.ENDC + bcolors.OKGREEN + " %s" % int_ip + bcolors.ENDC + ' netmask ' + bcolors.OKGREEN + '%s' % netmask + bcolors.ENDC)
+            print('[+] Internal IP obtained on %s:' % ifname + " %s" % int_ip + ' netmask '+ '%s' % netmask)
             external_IP_recon()
             return int_ip
         else:
 
-            print(bcolors.FAIL + "[!] Invalid IP obtained." + bcolors.ENDC + " Checking if we can bypass with static IP.\n")
+            print( "[!] Invalid IP obtained Checking if we can bypass with static IP.\n")
             return (static_bypass(ifname))
 
 

@@ -16,7 +16,6 @@ GNU General Public License for more details.
 import os, os.path, sys, socket
 import subprocess
 from prettytable import PrettyTable
-from src.utils.console_colors import *
 from dns import resolver
 from dns import reversename
 
@@ -49,15 +48,15 @@ class Hostname:
 
     def findHostnames(self, int_ip, CIDR, timestamp):
 
-        print(bcolors.OKGREEN + "      [ HOSTNAMES ENUMERATION MODULE ]\n" + bcolors.ENDC)
+        print("      [ HOSTNAMES ENUMERATION MODULE ]\n")
         hostname = socket.gethostname()
 
-        res_table = PrettyTable([bcolors.OKGREEN + '[IP]' + bcolors.ENDC, bcolors.OKGREEN + '[Hostname]' + bcolors.ENDC,
-                                 bcolors.OKGREEN + '[Domain]' + bcolors.ENDC,
-                                 bcolors.OKGREEN + '[Operating System]' + bcolors.ENDC], border=False, header=True)
+        res_table = PrettyTable(['[IP]', '[Hostname]',
+                                 '[Domain]',
+                                 '[Operating System]'], border=False, header=True)
         res_table.align = "l"
         print("Searching for hostnames in %s...\n" % CIDR)
-        print("Current Hostname:" + bcolors.TITLE + " %s" % hostname + bcolors.ENDC)
+        print("Current Hostname: %s" % hostname)
         print(" ")
         
         try:
@@ -115,14 +114,14 @@ class Hostname:
                                        self.domains_gathered[i].strip(), self.os_gathered[i].strip()])
             print(res_table)
         except:
-            print(bcolors.FAIL + "No Hostnames Found\n" + bcolors.ENDC)
+            print("No Hostnames Found\n")
         length = len(self.live_ips)
         if length != 0:
-            print(bcolors.OKGREEN + "\n      [  SCOPE DEFINITION MODULE ]\n" + bcolors.ENDC)
+            print("\n      [  SCOPE DEFINITION MODULE ]\n")
             for ip in self.live_ips:
                 if ip.strip() != int_ip.strip():
-                    print(bcolors.TITLE + "[+] " + bcolors.ENDC + "%s " % ip.strip() + "added to scope!")
+                    print("[+] " + "%s " % ip.strip() + "added to scope!")
         else:
             print(
-                    bcolors.WARNING + "NO LIVE IPS FOUND! THERE IS NO NEED TO CONTINUE! WARBERRY WILL NOW EXIT!" + bcolors.ENDC)
+                    "NO LIVE IPS FOUND! THERE IS NO NEED TO CONTINUE! WARBERRY WILL NOW EXIT!")
             sys.exit(1)
